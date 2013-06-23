@@ -1,0 +1,150 @@
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Apigee Training App</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+            <link rel="stylesheet" href="http://code.jquery.com/mobile/1.1.1/jquery.mobile-1.1.1.min.css" />
+            <script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+            <script src="http://code.jquery.com/mobile/1.1.1/jquery.mobile-1.1.1.min.js"></script>
+            <script src="https://apigee.com/usergrid/sdk/usergrid.0.10.5.js"></script>
+            <script type="text/javascript">
+                
+                var onTheCurb = new Usergrid.Client({
+                                                    orgName:'olja_test',
+                                                    appName:'freeStuff'
+                                                    });
+                
+                $(document).ready(function () {
+                                  $('#create-button').bind('click', createBook);
+                                  
+                                  loadStuff();
+                                  });
+                
+                function loadStuff (location) {
+                    // We now define my_books within the local scope
+                    // so we can pass it our latitude & longitude
+                    var my_stuff = new Usergrid.Collection( { "client":onTheCurb, "type":"stuff"} );
+                    
+                    my_stuff.fetch( // Actual network call
+                                   
+                                   // Success Callback
+                                   function () {
+                                   
+                                   $('#stuffs-list').empty();
+                                   
+                                   while ( my_stuff.hasNextEntity() ) {
+                                  
+                                   var current_stuff = my_stuff.getNextEntity();
+                                   
+                                   // Output the book on the page
+                                   $('#stuffs-list').append('<li><a href="#page-stuffs-detail2"><h3>'+current_stuff.get('title')+'</h3><p>'+current_stuff.get('description')+'</p><img src="' +current_stuff.get('photo') + '" style="thumb" height="200px" width="200px"/>'+'</a></li>');
+                                   }
+                                   
+                                   // Re-apply jQuery Mobile styles
+                                   $('#stuffs-list').listview('refresh');
+                                   },
+                                   
+                                   // Failure Callback
+                                   function () { alert("read failed"); }
+                                   );
+                }
+                
+                function createBook() {
+                    
+                    new_book = { "title":$("#title-field").val(),
+                        "author":$("#author-field").val() };
+                    
+                    my_books.addEntity(new_book, function (error, response) {
+                                       if (error) {
+                                       alert('write failed');
+                                       } else {
+                                       $("#title-field").val(""), $("#author-field").val("");
+                                       loadBooks();
+                                       history.back();
+                                       }
+                                       });
+                }
+                </script>
+            </head>
+    <body>
+        
+        <div data-role="page" data-theme="c" id="page-stuffs-list">
+            <div data-role="header" data-theme="b">
+                <h1>Find Stuff</h1>
+  		</div>
+            <div data-role="content">
+				<div>
+					<p>
+						<b>Available items close to you:
+						</b>
+					</p>
+				</div>
+                <ul id="stuffs-list"  data-role="listview" data-inset="false" >
+                    <li>
+						<!--<a href="#page-stuffs-detail" data-transition="slide"></a>-->
+						<h3>First Title</h3>
+                        <p>First author</p>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        
+		<div data-role="page" data-theme="c" id="page-stuffs-detail">
+			<div data-role="header" data-theme="b">
+                <h1>Chosen Stuff</h1>
+			</div>
+            <div data-role="content">
+				<div>
+					<p>
+						<b>This is the item you choose:
+						</b>
+					</p>
+				</div>
+                <ul id="stuffs-list"  data-role="listview" data-inset="false" >
+                    <li>
+						<h3>First Title</h3>
+                        <p>First author</p>
+                    </li>
+                </ul>
+            </div>
+			
+		</div>        
+
+		<div data-role="page" id="page-stuffs-detail2">
+      <div data-theme="a" data-role="header">
+          <a data-role="button" href="#page1" data-icon="arrow-l" data-iconpos="left"
+          class="ui-btn-left">
+              Back
+          </a>
+          <h3>
+              Stuff
+          </h3>
+      </div>
+      <div data-role="content">
+          <div>
+              <p>
+                  <b>
+                      Title
+                  </b>
+              </p>
+          </div>
+          <div>
+              <p>
+                  <b>
+                      Description
+                  </b>
+              </p>
+          </div>
+          <div style="width: 288px; height: 100px; position: relative; background-color: #fbfbfb; border: 1px solid #b8b8b8;">
+              <img src="http://codiqa.com/static/images/v2/image.png" alt="image" style="position: absolute; top: 50%; left: 50%; margin-left: -16px; margin-top: -18px">
+          </div>
+          <a data-role="button" href="#page1">
+              Got it!
+          </a>
+          <img src="https://maps.googleapis.com/maps/api/staticmap?center=Madison, WI&amp;zoom=14&amp;size=288x200&amp;markers=Madison, WI&amp;sensor=false"
+          width="288" height="200">
+      </div>
+  </div>
+	</body>
+</html>
